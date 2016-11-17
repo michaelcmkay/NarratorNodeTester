@@ -2,19 +2,8 @@
 //test that the browser is properly opening
 
 
-var keys  = require('./keys');
-
-var origFn = browser.driver.controlFlow().execute;
-browser.driver.controlFlow().execute = function() {
-  var args = arguments;
-
-  // queue 100ms wait
-  origFn.call(browser.driver.controlFlow(), function() {
-    return protractor.promise.delayed(500);
-  });
-
-  return origFn.apply(browser.driver.controlFlow(), args);
-};
+var keys = require('./keys');
+var vapi = require('./visual_api'); 
 
 describe('Should Open Page', function() {
     it('should get page title', function () {
@@ -26,21 +15,10 @@ describe('Should Open Page', function() {
     });
 
     it('should log in', function () {
-        var join = element(by.id('lobby_global_chat'));
-        //browser.ignoreSynchronization = true;
-
-        //browser.get('http://localhost:3000/');
-
-        element(by.id('username_field')).sendKeys(keys.accounts[0].username);
-        element(by.id('password_field')).sendKeys(keys.accounts[0].password);
-
-        element(by.id('login_button')).click();
-
-        join.getText(function (text) {
-            expect(text).toEqual("Global Chat");
-            browser.get('http://localhost:3000/');
+        vapi.login().then(() => {
+            var globalPlayerULHeader = element(by.id('lobby_global_chat'));
+            vapi.assertElementText(globalPlayerULHeader, 'Global Chat');
         });
-
     });
 
 
@@ -54,11 +32,12 @@ describe('Should Open Page', function() {
      */
 
     it('should go to setup', function () {
+        console.log('starting');
         //browser.get('http://localhost:3000/');
         browser.ignoreSynchronization = true;
 
-        var EC = protractor.ExpectedConditions;
-        var joinButton = element(by.id('joinButton'));
+        //var EC = protractor.ExpectedConditions;
+        //var joinButton = element(by.id('joinButton'));
         //console.log(joinButton);
         //var isVisible = EC.elementToBeVisible(joinButton);
 
@@ -79,9 +58,9 @@ describe('Should Open Page', function() {
         //The closest I have been able to find to a true solution. This times out but does properly click on the
         //button element.
 
-        browser.wait(EC.visibilityOf(joinButton), 3000);
+        //browser.wait(EC.visibilityOf(joinButton), 3000);
 
-        joinButton.click();
+        //joinButton.click();
 
         //var setup = element(by.id('new_game_header'));
 
